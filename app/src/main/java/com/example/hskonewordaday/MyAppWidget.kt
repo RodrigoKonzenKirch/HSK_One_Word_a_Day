@@ -20,7 +20,9 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
+import androidx.glance.text.TextDefaults
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 
 class MyAppWidget : GlanceAppWidget() {
 
@@ -53,16 +55,22 @@ private fun MyContent(
     onClick: () -> Unit = {}
 ){
     Column(
-        modifier = modifier.background(Color.LightGray),
+        modifier = modifier.background(Color.Black),
         verticalAlignment = Alignment.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = hanzi.value,
-            style = TextStyle(fontSize = 36.sp)
+            style = TextStyle(
+                color = ColorProvider(color = Color.White),
+                fontSize = 36.sp,
+            )
         )
         Text(
             text = "Translation",
+            style = TextStyle(
+                color = ColorProvider(color = Color.White),
+                ),
             modifier = GlanceModifier.padding(12.dp)
         )
         Row(horizontalAlignment = Alignment.CenterHorizontally) {
