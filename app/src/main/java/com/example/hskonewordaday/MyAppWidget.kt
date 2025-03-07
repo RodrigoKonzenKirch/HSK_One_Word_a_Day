@@ -2,9 +2,9 @@ package com.example.hskonewordaday
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,37 +20,44 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import androidx.glance.text.TextDefaults
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.example.hskonewordaday.data.AppDatabase.Companion.getDatabase
+import com.example.hskonewordaday.data.ChineseWordEntity
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MyAppWidget : GlanceAppWidget() {
 
-    val hanziList = listOf("好", "今", "日", "一", "天", "解", "中", "国", "文", "化")
+    @OptIn(DelicateCoroutinesApi::class)
     override suspend fun provideGlance(context: Context, id: GlanceId) {
 
+        val wordDao = getDatabase(context).chineseWordDao()
+        val randomWord = wordDao.getRandomWord()
 
         provideContent {
-            val hanzi = remember { mutableStateOf(getRandomHanzi(hanziList)) }
+            val hanzi = rememberSaveable { mutableStateOf(randomWord) }
             MyContent(
                 hanzi,
                 modifier = GlanceModifier.fillMaxSize(),
                 onClick = {
-                    hanzi.value = getRandomHanzi(hanziList)
+                    GlobalScope.launch(Dispatchers.IO) {
+                        hanzi.value = wordDao.getRandomWord()
+
+                    }
                 }
 
             )
         }
     }
 
-    fun getRandomHanzi(list: List<String>): String {
-        return list.random()
-    }
 }
 
 @Composable
 private fun MyContent(
-    hanzi: MutableState<String>,
+    hanzi: State<ChineseWordEntity>,
     modifier: GlanceModifier = GlanceModifier,
     onClick: () -> Unit = {}
 ){
@@ -60,17 +67,24 @@ private fun MyContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = hanzi.value,
+            text = "${hanzi.value.chineseSimplified} [${hanzi.value.chineseTraditional}]",
             style = TextStyle(
                 color = ColorProvider(color = Color.White),
                 fontSize = 36.sp,
             )
         )
         Text(
-            text = "Translation",
+            text = "${hanzi.value.pronunciationSymbol} [${hanzi.value.pronunciationNumber}]",
             style = TextStyle(
                 color = ColorProvider(color = Color.White),
                 ),
+            modifier = GlanceModifier.padding(12.dp)
+        )
+        Text(
+            text = hanzi.value.meaning,
+            style = TextStyle(
+                color = ColorProvider(color = Color.White),
+            ),
             modifier = GlanceModifier.padding(12.dp)
         )
         Row(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -79,6 +93,5 @@ private fun MyContent(
                 onClick = onClick
             )
         }
-
     }
 }
