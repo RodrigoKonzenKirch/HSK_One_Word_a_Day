@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "chinese_words")
 data class ChineseWordEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "hsk_level") val hskLevel: String,
     @ColumnInfo(name = "chinese_simplified") val chineseSimplified: String,
     @ColumnInfo(name = "chinese_traditional") val chineseTraditional: String,
     @ColumnInfo(name = "pronunciation_number") val pronunciationNumber: String,
