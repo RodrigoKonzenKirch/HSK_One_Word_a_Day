@@ -14,6 +14,7 @@ import androidx.glance.Button
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -22,10 +23,12 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
+import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.example.hskonewordaday.data.AppDatabase.Companion.getDatabase
+import com.example.hskonewordaday.data.ChineseWordDao
 import com.example.hskonewordaday.data.ChineseWordEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,29 +41,44 @@ class MyAppWidget : GlanceAppWidget() {
         val randomWord = wordDao.getRandomWord()
 
         provideContent {
-            var hanzi by rememberSaveable { mutableStateOf(randomWord) }
-            val scope = rememberCoroutineScope()
-
             GlanceTheme{
-                MyContent(
-                    hanzi,
-                    modifier = GlanceModifier.fillMaxSize(),
-                    onClick = {
-                        scope.launch(Dispatchers.IO) {
-                            hanzi = wordDao.getRandomWord()
-
-                        }
-                    }
-                )
+                GlanceContent(wordDao, randomWord)
             }
         }
     }
+}
 
+@Composable
+fun GlanceContent(
+    wordDao: ChineseWordDao,
+    randomWord: ChineseWordEntity
+) {
+    var hanzi by rememberSaveable { mutableStateOf(randomWord) }
+    val scope = rememberCoroutineScope()
+    var buttonEnabled by rememberSaveable { mutableStateOf(true) }
+
+    MyContent(
+        hanzi,
+        buttonEnabled,
+        modifier = GlanceModifier.fillMaxSize(),
+        onClick = {
+            buttonEnabled = false
+            scope.launch(Dispatchers.IO) {
+                var temporaryHanzi = wordDao.getRandomWord()
+                while (temporaryHanzi == hanzi) {
+                    temporaryHanzi = wordDao.getRandomWord()
+                }
+                hanzi = temporaryHanzi
+                buttonEnabled = true
+            }
+        }
+    )
 }
 
 @Composable
 private fun MyContent(
     hanzi: ChineseWordEntity,
+    buttonEnabled: Boolean,
     modifier: GlanceModifier = GlanceModifier,
     onClick: () -> Unit = {}
 ){
@@ -94,11 +112,15 @@ private fun MyContent(
             modifier = GlanceModifier.padding(12.dp)
         )
         // Refresh button
-        Row(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(horizontalAlignment = Alignment.CenterHorizontally, verticalAlignment = Alignment.CenterVertically) {
             Button(
                 text = "Refresh",
+                enabled = buttonEnabled,
                 onClick = onClick
             )
+            if (!buttonEnabled){
+                CircularProgressIndicator(modifier.size(24.dp), ColorProvider(color = Color.White))
+            }
         }
     }
 }
