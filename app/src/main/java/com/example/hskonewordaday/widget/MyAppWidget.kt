@@ -1,4 +1,4 @@
-package com.example.hskonewordaday
+package com.example.hskonewordaday.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
