@@ -1,5 +1,8 @@
 package com.example.hskonewordaday.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +28,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.hskonewordaday.data.ChineseWordEntity
@@ -122,34 +127,60 @@ fun WordItem(word: ChineseWordEntity) {
     val smallPadding = 8.dp
     Card( modifier = Modifier
         .fillMaxWidth()
-        .padding(smallPadding)) {
-        Text(
-            modifier = Modifier.padding(top = smallPadding, start = smallPadding),
-            text = word.hskLevel,
-            style = MaterialTheme.typography.labelSmall
-        )
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = word.chineseSimplified,
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(smallPadding),
-            text = word.chineseTraditional
-        )
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(smallPadding),
-            text = "${word.pronunciationSymbol} [${word.pronunciationNumber}]",
-        )
-        Text(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(smallPadding),
-            text = word.meaning,
-        )
+        .padding(smallPadding)
+    ) {
+        Column(
+            modifier = Modifier.padding(smallPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(smallPadding),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = word.hskLevel,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            // Simplified
+            Text(
+                text = word.chineseSimplified,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+            )
+            // Traditional
+            Text(
+                text = word.chineseTraditional,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            // Pronunciation
+            Text(
+                text = "${word.pronunciationSymbol} [${word.pronunciationNumber}]",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            // Meaning
+            Text(
+                text = word.meaning,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WordItemPreview() {
+    val sampleWord = ChineseWordEntity(
+        hskLevel = "HSK 1",
+        chineseSimplified = "你好",
+        chineseTraditional = "你好",
+        pronunciationSymbol = "nǐ hǎo",
+        pronunciationNumber = "ni3 hao3",
+        meaning = "hello"
+    )
+    WordItem(word = sampleWord)
 }
