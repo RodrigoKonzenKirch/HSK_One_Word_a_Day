@@ -1,4 +1,4 @@
-package com.example.hskonewordaday
+package com.example.hskonewordaday.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

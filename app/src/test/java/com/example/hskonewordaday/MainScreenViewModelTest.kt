@@ -2,6 +2,7 @@ package com.example.hskonewordaday
 
 import com.example.hskonewordaday.data.ChineseWordEntity
 import com.example.hskonewordaday.domain.WordsRepository
+import com.example.hskonewordaday.ui.MainScreenViewModel
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk

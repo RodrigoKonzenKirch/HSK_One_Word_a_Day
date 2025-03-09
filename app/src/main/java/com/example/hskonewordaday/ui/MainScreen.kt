@@ -1,4 +1,4 @@
-package com.example.hskonewordaday
+package com.example.hskonewordaday.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
