@@ -187,41 +187,61 @@ fun WordItem(word: ChineseWordEntity) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(smallPadding),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = word.hskLevel,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            // Simplified
-            Text(
-                text = word.chineseSimplified,
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            // Traditional
-            Text(
-                text = word.chineseTraditional,
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            // Pronunciation
-            Text(
-                text = "${word.pronunciationSymbol} [${word.pronunciationNumber}]",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            // Meaning
-            Text(
-                text = word.meaning,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            HskLevelRow(hskLevel = word.hskLevel)
+            SimplifiedChineseText(simplified = word.chineseSimplified)
+            TraditionalChineseText(traditional = word.chineseTraditional)
+            PronunciationText(pronunciationSymbol = word.pronunciationSymbol, pronunciationNumber = word.pronunciationNumber)
+            MeaningText(meaning = word.meaning)
         }
-
     }
+}
+
+@Composable
+fun HskLevelRow(hskLevel: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = hskLevel,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+fun SimplifiedChineseText(simplified: String) {
+    Text(
+        text = simplified,
+        style = MaterialTheme.typography.headlineLarge,
+        fontWeight = FontWeight.Bold,
+    )
+}
+
+@Composable
+fun TraditionalChineseText(traditional: String) {
+    Text(
+        text = traditional,
+        style = MaterialTheme.typography.bodyLarge,
+    )
+}
+
+@Composable
+fun PronunciationText(pronunciationSymbol: String, pronunciationNumber: String) {
+    Text(
+        text = "$pronunciationSymbol [$pronunciationNumber]",
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}
+
+@Composable
+fun MeaningText(meaning: String) {
+    Text(
+        text = meaning,
+        style = MaterialTheme.typography.bodyMedium,
+    )
 }
 
 @Preview(showBackground = true)
