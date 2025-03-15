@@ -30,10 +30,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.hskonewordaday.R
 import com.example.hskonewordaday.data.ChineseWordEntity
 import com.example.hskonewordaday.ui.theme.HSKOneWordADayTheme
 
@@ -67,7 +69,7 @@ fun MainScreen() {
                                 readOnly = true,
                                 value = showHskLevel.name,
                                 onValueChange = {},
-                                label = { Text("HSK Level") },
+                                label = { Text(stringResource(R.string.hsk_level)) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                 colors = ExposedDropdownMenuDefaults.textFieldColors()
                             )
@@ -113,9 +115,9 @@ fun Screen(
     if (uiState.value.error != null){
         Text(text = uiState.value.error!!)
     } else if (uiState.value.isLoading) {
-        Text(text = "Loading...")
+        Text(text = stringResource(R.string.loading))
     } else if (uiState.value.allWords.isEmpty()) {
-        Text(text = "No words found")
+        Text(text = stringResource(R.string.no_words_found))
     } else {
         WordList(
             words = (if (showHskLevel == HskLevel.ALL) {
