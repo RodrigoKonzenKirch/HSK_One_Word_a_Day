@@ -169,7 +169,7 @@ fun WordList(modifier: Modifier = Modifier, words: List<ChineseWordEntity>) {
     val listState = rememberLazyListState()
 
     LazyColumn(modifier = modifier, state = listState) {
-        items(words) { word ->
+        items(words, key = { word -> word.id }) { word ->
             WordItem(word = word)
         }
     }
