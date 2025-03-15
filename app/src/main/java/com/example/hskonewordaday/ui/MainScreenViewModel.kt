@@ -23,10 +23,10 @@ class MainScreenViewModel @Inject constructor(
     val allWords = _allWords.asStateFlow()
 
     init {
-        getAllWords()
+        loadAllWords()
     }
 
-    private fun getAllWords() {
+    private fun loadAllWords() {
         viewModelScope.launch(ioDispatcher) {
             repository.getAllWords().collect {
                 _allWords.value = it
