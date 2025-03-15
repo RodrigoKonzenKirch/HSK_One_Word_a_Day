@@ -64,14 +64,14 @@ class MainScreenViewModelTest {
         // Verify that if the repository emits an empty list, the 'allWords' 
         // StateFlow is updated to an empty list as well.
 
-        val words = emptyList<ChineseWordEntity>()
-        coEvery { fakeRepository.getAllWords() } returns flowOf(words)
-        val vm = MainScreenViewModel(fakeRepository, testDispatcher)
+        val emptyWords = emptyList<ChineseWordEntity>()
+        coEvery { fakeRepository.getAllWords() } returns flowOf(emptyWords)
+        val viewModel = MainScreenViewModel(fakeRepository, testDispatcher)
 
         advanceUntilIdle()
-        assertThat(vm.uiState.value.allWords).isEmpty()
-        assertThat(vm.uiState.value.isLoading).isFalse()
-        assertThat(vm.uiState.value.error).isNull()
+        assertThat(viewModel.uiState.value.allWords).isEmpty()
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.error).isNull()
     }
 
     @Test
@@ -79,13 +79,13 @@ class MainScreenViewModelTest {
         // Test the scenario where an error occurs during the retrieval of words 
         // from the repository, and ensure the StateFlow is still updated accordingly. (e.g empty list)
 
-        val exception = Exception("Test exception")
-        coEvery { fakeRepository.getAllWords() } throws exception
-        val vm = MainScreenViewModel(fakeRepository, testDispatcher)
+        val errorToThrow = Exception("Test exception")
+        coEvery { fakeRepository.getAllWords() } throws errorToThrow
+        val viewModel = MainScreenViewModel(fakeRepository, testDispatcher)
 
-        assertThat(vm.uiState.value.allWords).isEmpty()
-        assertThat(vm.uiState.value.isLoading).isFalse()
-        assertThat(vm.uiState.value.error).isEqualTo("Error loading words")
+        assertThat(viewModel.uiState.value.allWords).isEmpty()
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.error).isEqualTo("Error loading words")
     }
 
 }
