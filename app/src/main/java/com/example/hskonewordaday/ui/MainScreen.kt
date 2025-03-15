@@ -2,6 +2,7 @@ package com.example.hskonewordaday.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -93,22 +95,38 @@ fun MainScreen() {
                 )
             },
         ) { innerPadding ->
-
-            WordList(
-                words = (if (showHskLevel == HskLevel.ALL) {
-                    uiState.value.allWords
-                } else {
-                    uiState.value.allWords.filter { it.hskLevel.uppercase() == showHskLevel.name }
-                }
-                        ),
-                modifier = Modifier.padding(innerPadding)
-            )
+            Screen(uiState, showHskLevel, innerPadding)
         }
     }
 }
 
 enum class HskLevel {
     ALL, HSK1, HSK2, HSK3, HSK4, HSK5, HSK6
+}
+
+@Composable
+fun Screen(
+    uiState: State<MainScreenViewModel.MainScreenState>,
+    showHskLevel: HskLevel,
+    innerPadding: PaddingValues
+) {
+    if (uiState.value.error != null){
+        Text(text = uiState.value.error!!)
+    } else if (uiState.value.isLoading) {
+        Text(text = "Loading...")
+    } else if (uiState.value.allWords.isEmpty()) {
+        Text(text = "No words found")
+    } else {
+        WordList(
+            words = (if (showHskLevel == HskLevel.ALL) {
+                uiState.value.allWords
+            } else {
+                uiState.value.allWords.filter { it.hskLevel.uppercase() == showHskLevel.name }
+            }
+                    ),
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
 }
 
 @Composable
