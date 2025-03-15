@@ -97,7 +97,7 @@ fun MainScreen() {
                 )
             },
         ) { innerPadding ->
-            Screen(uiState, showHskLevel, innerPadding)
+            MainScreenContent(uiState, showHskLevel, innerPadding)
         }
     }
 }
@@ -107,29 +107,62 @@ enum class HskLevel {
 }
 
 @Composable
-fun Screen(
-    uiState: State<MainScreenViewModel.MainScreenState>,
+fun MainScreenContent(
+    uiState: State<MainScreenUiState>,
     showHskLevel: HskLevel,
     innerPadding: PaddingValues
 ) {
-    if (uiState.value.error != null){
-        Text(text = uiState.value.error!!)
-    } else if (uiState.value.isLoading) {
-        Text(text = stringResource(R.string.loading))
-    } else if (uiState.value.allWords.isEmpty()) {
-        Text(text = stringResource(R.string.no_words_found))
-    } else {
-        WordList(
-            words = (if (showHskLevel == HskLevel.ALL) {
-                uiState.value.allWords
+    when (uiState.value) {
+        is MainScreenUiState.Error -> { 
+            ErrorText(message = (uiState.value as MainScreenUiState.Error).message)
+        }
+        is MainScreenUiState.Loading -> {
+            LoadingText()
+        }
+        is MainScreenUiState.Empty -> {
+            EmptyWordListText()
+        }
+        is MainScreenUiState.Success -> {
+            val filteredWords = filterWordsByHskLevel(
+                (uiState.value as MainScreenUiState.Success).words, showHskLevel)
+
+            if (filteredWords.isEmpty()) {
+                EmptyWordListText()
             } else {
-                uiState.value.allWords.filter { it.hskLevel.uppercase() == showHskLevel.name }
+                WordList(
+                    words = filteredWords,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
-                    ),
-            modifier = Modifier.padding(innerPadding)
-        )
+        }
+
+    }
+
+}
+
+@Composable
+private fun ErrorText(message: String) {
+    Text(text = message)
+}
+
+@Composable
+private fun LoadingText() {
+    Text(text = stringResource(R.string.loading))
+}
+
+@Composable
+fun EmptyWordListText() {
+    Text(text = stringResource(R.string.no_words_found))
+}
+
+fun filterWordsByHskLevel(allWords: List<ChineseWordEntity>, showHskLevel: HskLevel): List<ChineseWordEntity> {
+    return if (showHskLevel == HskLevel.ALL) {
+        allWords
+    } else {
+        allWords.filter { it.hskLevel.uppercase() == showHskLevel.name }
     }
 }
+
 
 @Composable
 fun WordList(modifier: Modifier = Modifier, words: List<ChineseWordEntity>) {

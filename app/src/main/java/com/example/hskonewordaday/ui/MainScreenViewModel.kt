@@ -2,7 +2,6 @@ package com.example.hskonewordaday.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hskonewordaday.data.ChineseWordEntity
 import com.example.hskonewordaday.di.DispatcherIo
 import com.example.hskonewordaday.domain.WordsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,13 +18,7 @@ class MainScreenViewModel @Inject constructor(
     @DispatcherIo private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    data class MainScreenState(
-        val allWords: List<ChineseWordEntity> = emptyList(),
-        val isLoading: Boolean = false,
-        val error: String? = null
-    )
-
-    private val _uiState = MutableStateFlow(MainScreenState())
+    private val _uiState: MutableStateFlow<MainScreenUiState> = MutableStateFlow(MainScreenUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -34,21 +27,22 @@ class MainScreenViewModel @Inject constructor(
 
     private fun loadAllWords() {
         viewModelScope.launch(ioDispatcher) {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.value = MainScreenUiState.Loading
 
             try {
                 repository.getAllWords().collectLatest { words ->
-                    _uiState.value = _uiState.value.copy(allWords = words, isLoading = false)
+                    if (words.isEmpty()) {
+                        _uiState.value = MainScreenUiState.Empty
+                    } else {
+                        _uiState.value = MainScreenUiState.Success(words)
+                    }
                 }
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = "Error loading words")
+                _uiState.value = MainScreenUiState.Error("Error loading words")
 
                 e.printStackTrace()
             }
 
-//            repository.getAllWords().collect {
-//                _uiState.value = it
-//            }
         }
     }
 
