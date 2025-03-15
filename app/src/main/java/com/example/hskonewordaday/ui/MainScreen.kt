@@ -42,7 +42,7 @@ fun MainScreen() {
 
     val viewModel = hiltViewModel<MainScreenViewModel>()
 
-    val chineseWords = viewModel.allWords.collectAsState()
+    val uiState = viewModel.uiState.collectAsState()
 
     HSKOneWordADayTheme {
         Scaffold(
@@ -96,9 +96,9 @@ fun MainScreen() {
 
             WordList(
                 words = (if (showHskLevel == HskLevel.ALL) {
-                    chineseWords.value
+                    uiState.value.allWords
                 } else {
-                    chineseWords.value.filter { it.hskLevel.uppercase() == showHskLevel.name }
+                    uiState.value.allWords.filter { it.hskLevel.uppercase() == showHskLevel.name }
                 }
                         ),
                 modifier = Modifier.padding(innerPadding)

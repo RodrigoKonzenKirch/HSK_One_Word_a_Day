@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,11 +17,16 @@ import javax.inject.Inject
 class MainScreenViewModel @Inject constructor(
     private val repository: WordsRepository,
     @DispatcherIo private val ioDispatcher: CoroutineDispatcher
-
 ) : ViewModel() {
 
-    private val _allWords = MutableStateFlow<List<ChineseWordEntity>>(emptyList())
-    val allWords = _allWords.asStateFlow()
+    data class MainScreenState(
+        val allWords: List<ChineseWordEntity> = emptyList(),
+        val isLoading: Boolean = false,
+        val error: String? = null
+    )
+
+    private val _uiState = MutableStateFlow(MainScreenState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         loadAllWords()
@@ -28,9 +34,21 @@ class MainScreenViewModel @Inject constructor(
 
     private fun loadAllWords() {
         viewModelScope.launch(ioDispatcher) {
-            repository.getAllWords().collect {
-                _allWords.value = it
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
+            try {
+                repository.getAllWords().collectLatest { words ->
+                    _uiState.value = _uiState.value.copy(allWords = words, isLoading = false)
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false, error = "Error loading words")
+
+                e.printStackTrace()
             }
+
+//            repository.getAllWords().collect {
+//                _uiState.value = it
+//            }
         }
     }
 

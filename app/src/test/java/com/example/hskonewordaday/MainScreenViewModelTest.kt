@@ -35,7 +35,9 @@ class MainScreenViewModelTest {
         // Verify that the StateFlow 'allWords' emits an empty list 
         // immediately upon initialization of the ViewModel.
 
-        assertThat(viewModel.allWords.value).isEmpty()
+        assertThat(viewModel.uiState.value.allWords).isEmpty()
+        assertThat(viewModel.uiState.value.isLoading).isTrue()
+        assertThat(viewModel.uiState.value.error).isNull()
     }
 
     @Test
@@ -43,16 +45,18 @@ class MainScreenViewModelTest {
         // Test that when the repository emits a list of 'ChineseWordEntity', 
         // the ViewModel correctly updates the 'allWords' StateFlow with the same list.
 
-        val words = listOf(
+        val chineseWords = listOf(
             ChineseWordEntity(1, "HSK1", "一", "一", "yi", "yi1", "one"),
             ChineseWordEntity(2, "HSK2", "二", "二", "er", "er2", "two")
         )
-        coEvery { fakeRepository.getAllWords() } returns flowOf(words)
-        val vm = MainScreenViewModel(fakeRepository, testDispatcher)
+        coEvery { fakeRepository.getAllWords() } returns flowOf(chineseWords)
+        val viewModel = MainScreenViewModel(fakeRepository, testDispatcher)
 
         advanceUntilIdle()
 
-        assertThat(vm.allWords.value).containsExactlyElementsIn(words)
+        assertThat(viewModel.uiState.value.allWords).containsExactlyElementsIn(chineseWords)
+        assertThat(viewModel.uiState.value.isLoading).isFalse()
+        assertThat(viewModel.uiState.value.error).isNull()
     }
 
     @Test
@@ -65,7 +69,9 @@ class MainScreenViewModelTest {
         val vm = MainScreenViewModel(fakeRepository, testDispatcher)
 
         advanceUntilIdle()
-        assertThat(vm.allWords.value).isEmpty()
+        assertThat(vm.uiState.value.allWords).isEmpty()
+        assertThat(vm.uiState.value.isLoading).isFalse()
+        assertThat(vm.uiState.value.error).isNull()
     }
 
     @Test
@@ -77,7 +83,9 @@ class MainScreenViewModelTest {
         coEvery { fakeRepository.getAllWords() } throws exception
         val vm = MainScreenViewModel(fakeRepository, testDispatcher)
 
-        assertThat(vm.allWords.value).isEmpty()
+        assertThat(vm.uiState.value.allWords).isEmpty()
+        assertThat(vm.uiState.value.isLoading).isFalse()
+        assertThat(vm.uiState.value.error).isEqualTo("Error loading words")
     }
 
 }
