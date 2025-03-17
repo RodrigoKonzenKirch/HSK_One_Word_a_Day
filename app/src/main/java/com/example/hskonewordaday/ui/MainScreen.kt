@@ -41,10 +41,8 @@ import com.example.hskonewordaday.ui.theme.HSKOneWordADayTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen( viewModel: MainScreenViewModel = hiltViewModel<MainScreenViewModel>()) {
     var showHskLevel by rememberSaveable { mutableStateOf(HskLevel.ALL) }
-
-    val viewModel = hiltViewModel<MainScreenViewModel>()
 
     val uiState = viewModel.uiState.collectAsState()
 
